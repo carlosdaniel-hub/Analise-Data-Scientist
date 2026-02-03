@@ -54,7 +54,7 @@ if not df_filtrado.empty:
     total_registros = df_filtrado.shape[0]
     cargo_mais_frequente = df_filtrado["cargo"].mode()[0]
 else:
-    salario_medio, salario_mediano, salario_maximo, total_registros, cargo_mais_comum = 0, 0, 0, ""
+    salario_medio, salario_maximo, total_registros, cargo_mais_frequente = 0, 0, 0, ""
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Salário médio", f"${salario_medio:,.0f}")
@@ -99,7 +99,7 @@ with col_graf2:
     else:
         st.warning("Nenhum dado para exibir no gráfico de distribuição.")
 
-col_graf3, col_graf4 = st.columns(2)
+col_graf3, col_graf4, col_graf5 = st.columns(3)
 
 with col_graf3:
     if not df_filtrado.empty:
@@ -133,7 +133,32 @@ with col_graf4:
     else:
         st.warning("Nenhum dado para exibir no gráfico de países.")
 
+with col_graf5:
+    if not df_filtrado.empty:
+        df_ds = df_filtrado[df_filtrado['cargo'] == 'Data Scientist']
+        media_ds_pais = df_ds.groupby('residencia_iso3')['usd'].mean().reset_index().sort_values(by='usd', ascending=False)
+        grafico_paises = px.bar(media_ds_pais,
+            x='residencia_iso3',
+            y='usd',
+            title='Salário médio de Cientista de Dados por país',
+            hover_data={'usd' : ':.2f'},
+            labels={'usd': 'Salário médio (USD)', 'residencia_iso3': 'País'},
+            color='usd',
+            color_continuous_scale='Viridis'
+            
+        )
+        st.plotly_chart(grafico_paises, use_container_width=True)
+    else:
+        st.warning("Nenhum dado para exibir no gráfico de países.")
+       
+
+        
+
+
+
+
+
+
 # --- Tabela de Dados Detalhados ---
 st.subheader("Dados Detalhados")
-
 st.dataframe(df_filtrado)
